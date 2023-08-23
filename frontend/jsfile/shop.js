@@ -1,12 +1,13 @@
 let item = document.getElementById('data');
 
 document.addEventListener('DOMContentLoaded',fetchdata)
-item.addEventListener('click' , addtocart);
+
 
 async function fetchdata (e){
 const products = await axios.get('http://localhost:4000')
 
 const items = products.data;
+
 items.forEach(product=> {
   item.innerHTML += `<div class="col-md-4">
   <div class="card">
@@ -15,8 +16,9 @@ items.forEach(product=> {
       <h5 class="card-title">${product.title}</h5>
       <p class="card-text">${product.description}</p>
       <p class="card-text">${product.price}</p>
-      <a href="/htmlFile/products.html" class="btn btn-primary">Details</a>
-      <a href="/htmlFile/cart.html" class="btn btn-primary add-to-cart">Add to Cart</a>
+      <a href="../htmlFile/products.html?id=${product.id}" class="btn btn-sm btn-primary">View Details</a>
+          <a href="../htmlFile/cart.html?id=${product.id}"  class="btn btn-sm btn-outline-secondary">Add TO Cart</a>
+          <input type="hidden" id="productId" name="productId" value = ${product.id}>
     </div>
   </div>
 </div>`
