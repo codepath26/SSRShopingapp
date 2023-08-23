@@ -1,26 +1,32 @@
 let item = document.getElementById('data');
-
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('id');
+console.log(productId);
 document.addEventListener('DOMContentLoaded',fetchdata)
-item.addEventListener('click' , addtocart);
-
 async function fetchdata (e){
-const products = await axios.get('http://localhost:4000')
+const product1 = await axios.get(`http://localhost:4000/products/${productId}`)
+console.log(product1)
+const product = product1.data;
+  item.innerHTML = `
+  
+  <div class="container d-flex flex-column align-items-center">
+  <div class="title w-100 text-center">
+    <h1>${product.title}</h1>
+    <hr>
+  </div>
 
-const items = products.data;
-items.forEach(product=> {
-  item.innerHTML += `<div class="col-md-4">
-  <div class="card">
-    <img src="${product.imageUrl}" class="card-img-top" alt="Product Image">
-    <div class="card-body">
-      <h5 class="card-title">${product.title}</h5>
-      <p class="card-text">${product.description}</p>
-      <p class="card-text">${product.price}</p>
-      <a href="/htmlFile/products.html" class="btn btn-primary">Details</a>
-      <a href="/htmlFile/cart.html" class="btn btn-primary add-to-cart">Add to Cart</a>
+  <div class="row d-flex justify-content-center">
+    <div class="col-6">
+      <img src="${product.imageUrl}"  class="img-fluid"  alt="image" style=" width: 1000px; 
+      object-fit: cover;">
     </div>
   </div>
+  <h2><b>Price :</b>${product.price}</h2>
+  <div class="description">
+   <p>${product.description}</p>
+  </div>
 </div>`
-});
+
 
 }
 

@@ -11,11 +11,10 @@ exports.getProducts =async(req, res, next) => {
 }
 exports.getProduct = async(req, res, next) => {
   try{
-    const prodId = req.params.productId;
-    Product.findByPk(prodId)
-    .then(product => {
-     res.status(201).json(product);
-    })
+    const prodId =req.params.productId;
+       let product =  await  Product.findByPk(prodId)
+       res.status(201).json(product);
+    
   }catch(err){
     res.status(500).json({err : "internal sever erro"})
   }
@@ -31,10 +30,12 @@ exports.getIndex = async(req, res, next) => {
   }  
 };
 
-exports.getCart =async (req, res, next) => {
+exports.getCart = async (req, res, next) => {
   try{
     let cart = await req.user.getCart();
-    let products = cart.getProducts();
+    // console.log(cart)
+    let products = await cart.getProducts();
+
     res.status(201).json(products);
   }catch(err){
     res.status(500).json({err : "internal sever erro"})
@@ -45,6 +46,7 @@ exports.getCart =async (req, res, next) => {
 
 
 exports.postCart = async (req, res, next) => {
+  // console.log(req.body.productId)
   try {
     const prodId = req.body.productId;
     let newQuantity = 1;
@@ -67,8 +69,8 @@ exports.postCart = async (req, res, next) => {
     await cart.addProduct(product, {
       through: { quantity: newQuantity }
     });
-
-    res.redirect('/cart');
+    res.status(200).json({message : "done with cart"})
+   
   } catch(err){
     res.status(500).json({err : "internal sever erro"})
   } 
@@ -76,6 +78,7 @@ exports.postCart = async (req, res, next) => {
 
 exports.postCartDeleteProduct =async (req, res, next) => {
   try{
+      console.log(req.body.productId)
     const prodId = req.body.productId;
     let cart = await req.user.getCart()
     let products = await cart.getProducts({ where: { id: prodId } });
@@ -97,21 +100,19 @@ exports.postOrder = async (req, res, next) => {
 
     const cart = await req.user.getCart();
     fetchedCart = cart;
-
+    
     const products = await cart.getProducts();
-
+    
     const order = await req.user.createOrder();
     const orderProducts = products.map(product => {
-      return {
-        ...product,
-        orderItem: { quantity: product.cartItem.quantity }
-      };
+    
+        product.orderItem = { quantity: product.cartItem.quantity };
+        return product;
     });
     
     await order.addProducts(orderProducts);
     await fetchedCart.setProducts(null);
-
-    res.redirect('/orders');
+  res.status(200).json({message : "productremove success"})
   } catch (error) {
     res.status(500).json({err : "internal sever erro"})
     

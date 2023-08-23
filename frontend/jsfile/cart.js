@@ -1,43 +1,53 @@
 const cartList = document.getElementById('cart');
- const orderNowButton = document.getElementById('orderNowButton');
-
- document.addEventListener('DOMContentLoaded' , addcarts)
-
-    // Simulated cart data
-    const cartItems = [
-      { title: 'Product 1', quantity: 2 },
-      { title: 'Product 2', quantity: 1 },
-      // Add more cart items here
-    ];
-
-    // Populate the cart list with items
+const orderNowButton = document.getElementById('orderNowButton');
+let item = document.getElementById('data');
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('id');
+console.log(productId);
+document.addEventListener('DOMContentLoaded',fetchdata)
+async function fetchdata (e){
+   let d = await  axios.post(`http://localhost:4000/cart`,{ productId  : productId})
+   let products = await axios.get(`http://localhost:4000/cart`);
+    const cartItems = products.data;
+    console.log(cartItems)
     cartItems.forEach(item => {
       const cartItem = document.createElement('li');
-      cartItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-      cartItem.innerHTML = `
+      cartItem.className = 'list-group-item d-flex justify-content-between';
+      cartItem.innerHTML += `
         ${item.title}
-        <span class="badge badge-primary badge-pill">${item.quantity}</span>
+        <span>${item.cartItem.quantity}</span>
+        <input type="hidden" id="productId" name="productId" value = ${item.id}>
         <button class="btn btn-danger btn-sm delete-button">Delete</button>
       `;
       cartList.appendChild(cartItem);
     });
-
     // Add event listener to delete buttons
     const deleteButtons = document.querySelectorAll('.delete-button');
     deleteButtons.forEach(button => {
       button.addEventListener('click', removeCartItem);
     });
 
-    function removeCartItem(event) {
+  async  function removeCartItem(event) {
+      let li = event.target.parentNode
+       let item = document.getElementById('productId')
+       let id = item.value
       const listItem = event.target.closest('.list-group-item');
+      await axios.post('http://localhost:4000/cart-delete-item',{
+        productId : id,
+      })
       cartList.removeChild(listItem);
     }
 
     // Add event listener to "Order Now" button
     orderNowButton.addEventListener('click', placeOrder);
     
-    function placeOrder() {
-      alert('Order placed successfully!');
-      // Reset the cart (for demonstration)
+   async function placeOrder() {
+      await axios.post('http://localhost:4000/create-order')
+       window.location.href ='../htmlFile/order.html';
       cartList.innerHTML = '';
     }
+}
+  
+    
+
+    

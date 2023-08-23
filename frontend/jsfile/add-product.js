@@ -7,19 +7,18 @@ let form = document.getElementById('form-data')
 form.addEventListener('submit', adddata);
 
 async function adddata (e){
-  e.preventDefault();
+  console.log(Title.value)
+  // e.preventDefault();
   let obj = {
     title: Title.value,
     imageUrl: ImageUrl.value,
     price: Price.value,
     description: Description.value,
     }
-    let jsonString = JSON.stringify(obj);
+
     try{
-      let product = await axios.post('http://localhost:4000/admin/add-product',jsonString,{headers: {
-        'Content-Type': 'application/json'
-      }});
-      console.log(product.data)
+      let product = await axios.post('http://localhost:4000/admin/add-product',obj);
+      console.log(product)
     }catch(err){
       console.log(err)
     }
